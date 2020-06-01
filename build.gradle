@@ -27,6 +27,7 @@ dependencies {
 	compile('org.aspectj:aspectjtools:1.8.1')
 	compile('org.aspectj:aspectjrt:1.8.9')
 	compile('org.springframework.boot:spring-boot-starter-web:1.5.22.RELEASE')
+	compile('redis.clients:jedis:2.6.2')
 
     testCompile 'junit:junit:4.12'
 }
