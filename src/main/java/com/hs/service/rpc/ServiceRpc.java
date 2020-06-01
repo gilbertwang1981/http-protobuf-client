@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.hs.cfg.center.sdk.AppCfgCenter;
 import com.hs.http.client.ServiceRpcHttpClient;
+import com.hs.http.client.cfg.AppCfgCenter;
 
 public class ServiceRpc {
 	private static Logger logger = LoggerFactory.getLogger(ServiceRpc.class);

@@ -12,8 +12,6 @@ description = "基于protobuf协议的http客户端";
 
 repositories {
 	maven {url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-	maven {url 'http://nexus.huasheng100.com/nexus/content/repositories/releases' }
-	maven {url 'http://nexus.huasheng100.com/nexus/content/repositories/snapshots' }
 }
 
 // In this section you declare the dependencies for your production and test code
@@ -24,15 +22,11 @@ dependencies {
 	compile('org.apache.httpcomponents:httpclient:4.5.2')
 	compile('org.apache.httpcomponents:httpcore:4.4')
 	compile('com.google.code.gson:gson:2.8.5')
-	compile('com.hs:config-center-client:0.0.8')
-	compile('com.hs.protosdk.platfrom-service:config-center-service-api:0.0.3')
 	compile('com.googlecode.protobuf-java-format:protobuf-java-format:1.4')
 	compile('com.google.protobuf:protobuf-java:3.6.1')
 	compile('org.aspectj:aspectjtools:1.8.1')
 	compile('org.aspectj:aspectjrt:1.8.9')
 	compile('org.springframework.boot:spring-boot-starter-web:1.5.22.RELEASE')
-	
-	compile('com.hs.protosdk.platfrom-service:dschedule-service-api:0.0.7')
 
     testCompile 'junit:junit:4.12'
 }

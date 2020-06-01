@@ -18,7 +18,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hs.cfg.center.sdk.AppCfgCenter;
+import com.hs.http.client.cfg.AppCfgCenter;
 import com.hs.http.consts.ServiceRpcHttpClientConsts;
 
 public class ServiceRpcHttpClient {
