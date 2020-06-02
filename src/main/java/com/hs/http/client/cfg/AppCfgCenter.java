@@ -5,7 +5,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.hs.http.client.annotation.impl.ServiceMgr;
 import com.hs.http.client.redis.RedisRepository;
 import com.hs.http.client.utils.AddressConvertor;
@@ -14,21 +18,37 @@ import com.hs.http.consts.ServiceRpcHttpClientConsts;
 public class AppCfgCenter {
 	private static String service;
 	
+	private static final Integer FLUSH_TIMEOUT = 5;
+	private static final Integer INIT_SIZE = 8;
+	private static final Integer MAX_SIZE = 128;
+	
+	private static LoadingCache<String , String> configCache = CacheBuilder.newBuilder().initialCapacity(INIT_SIZE).maximumSize(MAX_SIZE)
+			.refreshAfterWrite(FLUSH_TIMEOUT , TimeUnit.SECONDS)
+			.recordStats().build(new CacheLoader<String , String>() {
+	        @Override
+	        public String load(String key) {
+	        	String value = RedisRepository.getInstance().get(key);
+	        	if (value == null) {
+	        		return "";
+	        	}
+	        	
+	        	return value;
+	        }
+    });
+	
 	public static Integer getKey(String service , String key , Integer defaultValue) {
-		String value = RedisRepository.getInstance().get(ServiceRpcHttpClientConsts.DEFAULT_REDIS_KEY_PREFIX + ":" + service + ":" + key);
-		if (value == null) {
+		try {
+			return Integer.parseInt(configCache.get(ServiceRpcHttpClientConsts.DEFAULT_REDIS_KEY_PREFIX + ":" + service + ":" + key));
+		} catch (Exception e) {
 			return defaultValue;
-		} else {
-			return Integer.parseInt(value);
 		}
 	}
 	
 	public static String getKey(String service , String key , String defaultValue) {
-		String value = RedisRepository.getInstance().get(ServiceRpcHttpClientConsts.DEFAULT_REDIS_KEY_PREFIX + ":" + service + ":" + key);
-		if (value == null) {
+		try {
+			return configCache.get(ServiceRpcHttpClientConsts.DEFAULT_REDIS_KEY_PREFIX + ":" + service + ":" + key);
+		} catch (Exception e) {
 			return defaultValue;
-		} else {
-			return value;
 		}
 	}
 	
