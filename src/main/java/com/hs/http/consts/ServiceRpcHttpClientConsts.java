@@ -15,10 +15,10 @@ public interface ServiceRpcHttpClientConsts {
 	public static final Integer REDIS_CONFIG_MAX_WAIT_IN_MILLS = 1000;
 	public static final Integer REDIS_CONFIG_POOL_TMO = 1000;
 	
-	public static final Integer SERVICE_REG_DISCOVERY_EXP = 10000;
+	public static final Integer SERVICE_REG_DISCOVERY_EXP = 50000;
 	
 	public static final Integer DEFAULT_TIMER_DELAY = 10;
-	public static final Integer DEFAULT_TIMER_INTERVAL = 5000;
+	public static final Integer DEFAULT_TIMER_INTERVAL = 3000;
 	
 	public static final String DEFAULT_REDIS_KEY_PREFIX = "service-discovery-key-prefix";
 }
