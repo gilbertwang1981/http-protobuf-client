@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import com.hs.http.client.annotation.impl.ServiceMgr;
 import com.hs.http.client.redis.RedisRepository;
 import com.hs.http.client.utils.AddressConvertor;
 import com.hs.http.consts.ServiceRpcHttpClientConsts;
@@ -40,8 +41,26 @@ public class AppCfgCenter {
 		}
 	}
 	
+	public static Boolean delServiceHost(String service , String host) {
+		return RedisRepository.getInstance().srem(ServiceRpcHttpClientConsts.DEFAULT_REDIS_KEY_PREFIX + ":" + service + ":hosts" , host);
+	}
+	
+	public static Set<String> getServiceNames() {
+		return ServiceMgr.getInstance().getAllServices();
+	}
+	
 	public static Boolean registerService(String service) throws IOException {
-		return RedisRepository.getInstance().sadd(ServiceRpcHttpClientConsts.DEFAULT_REDIS_KEY_PREFIX + ":" + service + ":hosts" , AddressConvertor.getLocalIPList().get(0));
+		return RedisRepository.getInstance().sadd(ServiceRpcHttpClientConsts.DEFAULT_REDIS_KEY_PREFIX + ":" + service + ":hosts" , 
+				AddressConvertor.getLocalIPList().get(0) , -1);
+	}
+	
+	public static Boolean pingService(String service) throws IOException {
+		return RedisRepository.getInstance().set(ServiceRpcHttpClientConsts.DEFAULT_REDIS_KEY_PREFIX + ":" + service + ":host:" + AddressConvertor.getLocalIPList().get(0) , 
+				 service , ServiceRpcHttpClientConsts.SERVICE_REG_DISCOVERY_EXP);
+	}
+	
+	public static Boolean isExisted(String ip , String service) {
+		return RedisRepository.getInstance().isExsited(ServiceRpcHttpClientConsts.DEFAULT_REDIS_KEY_PREFIX + ":" + service + ":host:" + ip);
 	}
 	
 	public static void setServiceName(String service) {

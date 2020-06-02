@@ -1,6 +1,8 @@
 package com.hs.http.client.annotation.impl;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,21 +39,27 @@ public class ServiceStartupDiscovery extends ServiceRegisterSpringFactoryImportS
 		String desc = attributes.getString("desc");
 		
 		AppCfgCenter.setServiceName(service);
-		
-		if (!AppCfgCenter.registerService(service)) {
-			logger.error("服务注册失败，进程启动失败 {}" , service);
 			
-			System.exit(-1);
-		}
-		
-		logger.info("【服务注册】服务名：{} 服务描述：{}" , service , desc);
-		
-		if(!AppCfgCenterMonitor.getInstance().listen()) {
-			logger.error("服务监听失败");
+		if (!AppCfgCenter.registerService(service)) {
+			logger.error("服务注册失败 {}" , service);
 			
 			System.exit(0);
 		}
 		
-		logger.info("监控端口启动，{}" , ServiceRpcHttpClientConsts.DEFAULT_SERVICE_LISTEN_PORT);
+		new Timer().scheduleAtFixedRate(new TimerTask() {
+			public void run() {
+				try {
+					if (!AppCfgCenter.pingService(service)) {
+						logger.error("心跳失败 {}" , service);
+					} else {
+						logger.info("心跳成功 {}" , service);
+					}
+				} catch (IOException e) {
+					logger.error("心跳异常 {}" , e.getMessage());
+				}
+			}
+		} , ServiceRpcHttpClientConsts.DEFAULT_TIMER_DELAY , ServiceRpcHttpClientConsts.DEFAULT_TIMER_INTERVAL); 
+		
+		logger.info("【服务注册】服务名：{} 服务描述：{}" , service , desc);
 	}
 }

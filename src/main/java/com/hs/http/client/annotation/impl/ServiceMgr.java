@@ -1,6 +1,8 @@
 package com.hs.http.client.annotation.impl;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ServiceMgr {
@@ -27,5 +29,9 @@ public class ServiceMgr {
 	
 	public void setService(String clazz , String service) {
 		servicesMapper.put(clazz , service);
+	}
+	
+	public Set<String> getAllServices() {
+		return new TreeSet<>(servicesMapper.values());
 	}
 }

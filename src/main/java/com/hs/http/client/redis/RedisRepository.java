@@ -95,7 +95,25 @@ public class RedisRepository {
 		return null;
 	}
 	
-	public Boolean sadd(String key , String value) {
+	public Boolean isExsited(String key) {
+		Jedis jedis = null;
+		try {
+			jedis = jedisPool.getResource();
+			if (jedis != null) {
+				return jedis.exists(key);
+			}
+		} catch (Exception e) {
+			logger.error("set redis缓存失败, {}" , e.getMessage());
+		} finally {
+			if (jedis != null) {
+				jedis.close();
+			}
+		}
+		
+		return Boolean.FALSE;
+	}
+	
+	public Boolean sadd(String key , String value , int exp) {
 		Jedis jedis = null;
 		try {
 			jedis = jedisPool.getResource();
@@ -106,6 +124,9 @@ public class RedisRepository {
 			}
 			
 			jedis.sadd(key, value);
+			if (exp > 0) {
+				jedis.expire(key, exp);
+			}
 			
 			return true;
 		} catch (Exception e) {
