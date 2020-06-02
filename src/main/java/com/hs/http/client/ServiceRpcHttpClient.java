@@ -27,8 +27,8 @@ public class ServiceRpcHttpClient {
 	private CloseableHttpClient httpClient = null;
 	
 	private static final Integer HTTP_CODE_SUCCESS = 200;
-	private static final Integer CONNECT_TIMEOUT = 250;
-	private static final Integer READ_TIMEOUT = 100;
+	private static final Integer CONNECT_TIMEOUT = 1000;
+	private static final Integer READ_TIMEOUT = 500;
 	private static final Integer MAX_TOTAL_CONN = 100;
 	private static final Integer MAX_PER_ROUTE = 25;
 	private static final Integer MAX_RETRY_TIMES = 2;
@@ -36,30 +36,44 @@ public class ServiceRpcHttpClient {
 	
 	private String serviceName;
 	
+	// 局部配置，根据具体被调用的服务配置
+	// 键值：/本服务名/被调用的服务名/service-rpc-default-doamin-name
 	public String getDefaultDomainName(String service) {
 		return AppCfgCenter.getKey(serviceName , "/" + service + "/" + ServiceRpcHttpClientConsts.SERVICE_RPC_HTTP_DEFAULT_DOMAIN , "");
 	}
 	
+	// 全局配置，当前服务共享配置
+	// 键值：/本服务名/service-rpc-retry-times
 	private Integer getMaxRetryTimes(String service) {
 		return AppCfgCenter.getKey(service , ServiceRpcHttpClientConsts.SERVICE_RPC_HTTP_RETRY_TIMES , MAX_RETRY_TIMES);
 	}
 	
-	private Integer getConnectionTimeout(String service , String method) {
-		return AppCfgCenter.getKey(service , method  + "/" + ServiceRpcHttpClientConsts.SERVICE_RPC_HTTP_CONNECT_TIMEOUT , CONNECT_TIMEOUT);
+	// 局部配置，根据具体被调用的服务配置
+	// 键值：/本服务名/被调用的服务名/method/service-rpc-connect-timeout
+	private Integer getConnectionTimeout(String service , String calledService , String method) {
+		return AppCfgCenter.getKey(service , "/" + calledService + "/" + method  + "/" + ServiceRpcHttpClientConsts.SERVICE_RPC_HTTP_CONNECT_TIMEOUT , CONNECT_TIMEOUT);
 	}
 	
-	private Integer getReadTimeout(String service , String method) {
-		return AppCfgCenter.getKey(service , method  + "/" + ServiceRpcHttpClientConsts.SERVICE_RPC_HTTP_READ_TIMEOUT , READ_TIMEOUT);
+	// 局部配置，根据具体被调用的服务配置
+	// 键值：/本服务名/被调用的服务名/method/service-rpc-read-timeout
+	private Integer getReadTimeout(String service , String calledService , String method) {
+		return AppCfgCenter.getKey(service , "/" + calledService + "/" + method  + "/" + ServiceRpcHttpClientConsts.SERVICE_RPC_HTTP_READ_TIMEOUT , READ_TIMEOUT);
 	}
 	
+	// 全局配置，当前服务共享配置
+	// 键值：/本服务名/service-rpc-max-conn-num
 	private Integer getMaxConnection(String service) {
 		return AppCfgCenter.getKey(service, ServiceRpcHttpClientConsts.SERVICE_RPC_HTTP_MAX_CONNS , MAX_TOTAL_CONN);
 	}
 	
+	// 全局配置，当前服务共享配置
+	// 键值：/本服务名/service-rpc-max-conn-per-route
 	private Integer getMaxConnectionPerRoute(String service) {
 		return AppCfgCenter.getKey(service, ServiceRpcHttpClientConsts.SERVICE_RPC_HTTP_MAX_CONNS_PER_ROUTE , MAX_PER_ROUTE);
 	}
 	
+	// 全局配置，当前服务共享配置
+	// 键值：/本服务名/service-rpc-keep-alive-time
 	private Integer getKeepaliveTime(String service) {
 		return AppCfgCenter.getKey(service, ServiceRpcHttpClientConsts.SERVICE_RPC_HTTP_KEEPALIVE_TIME , DEFAULT_KA_TIME);
 	}
@@ -94,7 +108,7 @@ public class ServiceRpcHttpClient {
 		        .build();  
 	}
 
-	public HttpResponse post(String host , Integer port , String url , byte[] content) throws Exception {
+	public HttpResponse post(String service , String host , Integer port , String url , byte[] content) throws Exception {
 		logger.info("选择服务器地址 {}:{}" , host , port);
 		
 		try {
@@ -106,8 +120,8 @@ public class ServiceRpcHttpClient {
 		    post.addHeader("Connection", "keep-alive");
 		    
 		    RequestConfig rconfig = RequestConfig.custom().
-		    		setSocketTimeout(getReadTimeout(serviceName , url)).
-		    		setConnectTimeout(getConnectionTimeout(serviceName , url)).build();
+		    		setSocketTimeout(getReadTimeout(serviceName , service , url)).
+		    		setConnectTimeout(getConnectionTimeout(serviceName , service , url)).build();
 		    post.setConfig(rconfig);
 		    
 		    HttpResponse response = httpClient.execute(post);

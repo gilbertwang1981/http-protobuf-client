@@ -64,7 +64,7 @@ public class ServiceRpc {
 		if (targetHost != null && ! "".equals(targetHost)) {
 			logger.info("使用域名路由 {}" , client.getDefaultDomainName(service));
 			
-			return client.post(targetHost , getPort() , method , content);
+			return client.post(service , targetHost , getPort() , method , content);
 		}
 		
 		List<String> hosts = hostsCache.get(service);
@@ -81,7 +81,7 @@ public class ServiceRpc {
 		
 		counter.compareAndSet(Integer.MAX_VALUE - DEFAULT_DELTA , 0);
 		
-		return client.post(
+		return client.post(service , 
 				hosts.get(counter.addAndGet(1) % hosts.size()) , 
 				getPort() , method , content);
 	}
