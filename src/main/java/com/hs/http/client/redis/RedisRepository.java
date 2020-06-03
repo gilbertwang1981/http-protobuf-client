@@ -43,17 +43,62 @@ public class RedisRepository {
 		return System.getenv("REDIS_PASS");
 	}
 	
+	public Integer getRedisMaxIdle() {
+		String idle = System.getenv("REDIS_MAX_IDLE");
+		if (idle == null) {
+			return ServiceRpcHttpClientConsts.REDIS_CONFIG_MAX_IDLE;
+		} else {
+			return Integer.parseInt(idle);
+		}
+	}
+	
+	public Integer getRedisMinIdle() {
+		String idle = System.getenv("REDIS_MIN_IDLE");
+		if (idle == null) {
+			return ServiceRpcHttpClientConsts.REDIS_CONFIG_MIN_IDLE;
+		} else {
+			return Integer.parseInt(idle);
+		}
+	}
+	
+	public Integer getRedisMaxTotal() {
+		String total = System.getenv("REDIS_MAX_TOTAL");
+		if (total == null) {
+			return ServiceRpcHttpClientConsts.REDIS_CONFIG_MAX_TOTAL;
+		} else {
+			return Integer.parseInt(total);
+		}
+	}
+	
+	public Integer getRedisMaxWaitInMills() {
+		String wait = System.getenv("REDIS_MAX_WAIT_IN_MILLS");
+		if (wait == null) {
+			return ServiceRpcHttpClientConsts.REDIS_CONFIG_MAX_WAIT_IN_MILLS;
+		} else {
+			return Integer.parseInt(wait);
+		}
+	}
+	
+	public Integer getRedisPoolTimeout() {
+		String timeout = System.getenv("REDIS_POOL_TIMEOUT");
+		if (timeout == null) {
+			return ServiceRpcHttpClientConsts.REDIS_CONFIG_POOL_TMO;
+		} else {
+			return Integer.parseInt(timeout);
+		}
+	}
+	
 	private RedisRepository() {
 		JedisPoolConfig config = new JedisPoolConfig();
 		config.setBlockWhenExhausted(false);
 		config.setJmxEnabled(true);
-		config.setMaxIdle(ServiceRpcHttpClientConsts.REDIS_CONFIG_MAX_IDLE);
-		config.setMaxTotal(ServiceRpcHttpClientConsts.REDIS_CONFIG_MAX_TOTAL);
-		config.setMaxWaitMillis(ServiceRpcHttpClientConsts.REDIS_CONFIG_MAX_WAIT_IN_MILLS);
-		config.setMinIdle(ServiceRpcHttpClientConsts.REDIS_CONFIG_MIN_IDLE);
+		config.setMaxIdle(getRedisMaxIdle());
+		config.setMaxTotal(getRedisMaxTotal());
+		config.setMaxWaitMillis(getRedisMaxWaitInMills());
+		config.setMinIdle(getRedisMinIdle());
 		
 		jedisPool = new JedisPool(config , getRedisHost() , Integer.parseInt(getRedisPort()) , 
-				ServiceRpcHttpClientConsts.REDIS_CONFIG_POOL_TMO , getRedisPass());
+				getRedisPoolTimeout() , getRedisPass());
 	}
 	
 	public Boolean set(String key , String value , int milliseconds) {

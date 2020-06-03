@@ -36,7 +36,7 @@ public class CfgCenterServiceChecker {
             			String host = hostIterator.next();
             			try {
 	            			if (!ping(host , service)) {
-	            				logger.info("删除节点 {}-{}" , service , host);
+	            				logger.info("删除节点 {}/{}" , service , host);
 	            				
 	            				AppCfgCenter.delServiceHost(service, host);
 	            			} else {
